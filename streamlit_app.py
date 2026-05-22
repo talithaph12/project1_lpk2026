@@ -20,3 +20,7 @@ st.markdown(multi)
 import streamlit as st
 
 st.balloons()
+
+import streamlit as st
+
+st.snow()
