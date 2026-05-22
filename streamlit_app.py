@@ -1,4 +1,3 @@
-
 import streamlit as st
 
 st.set_page_config(page_title="ChemLab Standardisasi", layout="centered")
@@ -56,7 +55,10 @@ if menu == "Alkalimetri":
     mr = mr_database[senyawa]
 
     massa = st.number_input("Massa standar primer (g)", min_value=0.0)
-    volume = st.number_input("Volume NaOH (mL)", min_value=0.0)
+    volume1 = st.number_input("Volume titrasi 1 (mL)", min_value=0.0)
+    volume2 = st.number_input("Volume titrasi 2 (mL)", min_value=0.0)
+
+    volume = (volume1 + volume2) / 2
     valensi = st.number_input("Valensi", min_value=1.0, value=2.0)
 
     be = mr / valensi
@@ -66,10 +68,13 @@ if menu == "Alkalimetri":
     st.info(f"Indikator = {indikator_data[menu]}")
 
     if st.button("Hitung Alkalimetri"):
+        faktor = 1000
         ekuivalen = massa / be
-        normalitas = ekuivalen / (volume / 1000)
+        normalitas = (ekuivalen * faktor) / volume
         molaritas = normalitas / valensi
 
+        st.write(f"Rata-rata volume = {volume:.2f} mL")
+        st.write(f"Rumus normalitas = (BE × faktor) / volume")
         st.success(f"Normalitas NaOH = {normalitas:.4f} N")
         st.success(f"Molaritas NaOH = {molaritas:.4f} M")
 
@@ -84,7 +89,10 @@ elif menu == "Asidimetri":
     mr = mr_database[senyawa]
 
     massa = st.number_input("Massa Na2CO3 (g)", min_value=0.0)
-    volume = st.number_input("Volume HCl (mL)", min_value=0.0)
+    volume1 = st.number_input("Volume titrasi 1 (mL)", min_value=0.0)
+    volume2 = st.number_input("Volume titrasi 2 (mL)", min_value=0.0)
+
+    volume = (volume1 + volume2) / 2
     valensi = st.number_input("Valensi", min_value=1.0, value=2.0)
 
     be = mr / valensi
@@ -94,8 +102,9 @@ elif menu == "Asidimetri":
     st.info(f"Indikator = {indikator_data[menu]}")
 
     if st.button("Hitung Asidimetri"):
+        faktor = 1000
         ekuivalen = massa / be
-        normalitas = ekuivalen / (volume / 1000)
+        normalitas = (ekuivalen * faktor) / volume
         molaritas = normalitas / valensi
 
         st.success(f"Normalitas HCl = {normalitas:.4f} N")
@@ -112,7 +121,10 @@ elif menu == "Permanganometri":
     mr = mr_database[senyawa]
 
     massa = st.number_input("Massa Asam Oksalat (g)", min_value=0.0)
-    volume = st.number_input("Volume KMnO4 (mL)", min_value=0.0)
+    volume1 = st.number_input("Volume titrasi 1 (mL)", min_value=0.0)
+    volume2 = st.number_input("Volume titrasi 2 (mL)", min_value=0.0)
+
+    volume = (volume1 + volume2) / 2
     valensi = st.number_input("Valensi", min_value=1.0, value=2.0)
 
     be = mr / valensi
@@ -122,8 +134,9 @@ elif menu == "Permanganometri":
     st.info(f"Indikator = {indikator_data[menu]}")
 
     if st.button("Hitung Permanganometri"):
+        faktor = 1000
         ekuivalen = massa / be
-        normalitas = ekuivalen / (volume / 1000)
+        normalitas = (ekuivalen * faktor) / volume
         molaritas = normalitas / 5
 
         st.success(f"Normalitas KMnO4 = {normalitas:.4f} N")
@@ -140,7 +153,10 @@ elif menu == "Iodometri":
     mr = mr_database[senyawa]
 
     massa = st.number_input("Massa KIO3 (g)", min_value=0.0)
-    volume = st.number_input("Volume Na2S2O3 (mL)", min_value=0.0)
+    volume1 = st.number_input("Volume titrasi 1 (mL)", min_value=0.0)
+    volume2 = st.number_input("Volume titrasi 2 (mL)", min_value=0.0)
+
+    volume = (volume1 + volume2) / 2
     valensi = st.number_input("Valensi", min_value=1.0, value=6.0)
 
     be = mr / valensi
@@ -150,8 +166,9 @@ elif menu == "Iodometri":
     st.info(f"Indikator = {indikator_data[menu]}")
 
     if st.button("Hitung Iodometri"):
+        faktor = 1000
         ekuivalen = massa / be
-        normalitas = ekuivalen / (volume / 1000)
+        normalitas = (ekuivalen * faktor) / volume
         molaritas = normalitas / valensi
 
         st.success(f"Normalitas Na2S2O3 = {normalitas:.4f} N")
@@ -168,7 +185,10 @@ elif menu == "Argentometri":
     mr = mr_database[senyawa]
 
     massa = st.number_input("Massa NaCl (g)", min_value=0.0)
-    volume = st.number_input("Volume AgNO3 (mL)", min_value=0.0)
+    volume1 = st.number_input("Volume titrasi 1 (mL)", min_value=0.0)
+    volume2 = st.number_input("Volume titrasi 2 (mL)", min_value=0.0)
+
+    volume = (volume1 + volume2) / 2
     valensi = st.number_input("Valensi", min_value=1.0, value=1.0)
 
     be = mr / valensi
@@ -178,8 +198,9 @@ elif menu == "Argentometri":
     st.info(f"Indikator = {indikator_data[menu]}")
 
     if st.button("Hitung Argentometri"):
+        faktor = 1000
         ekuivalen = massa / be
-        normalitas = ekuivalen / (volume / 1000)
+        normalitas = (ekuivalen * faktor) / volume
         molaritas = normalitas / valensi
 
         st.success(f"Normalitas AgNO3 = {normalitas:.4f} N")
@@ -196,7 +217,10 @@ elif menu == "Kompleksometri":
     mr = mr_database[senyawa]
 
     massa = st.number_input("Massa CaCO3 (g)", min_value=0.0)
-    volume = st.number_input("Volume EDTA (mL)", min_value=0.0)
+    volume1 = st.number_input("Volume titrasi 1 (mL)", min_value=0.0)
+    volume2 = st.number_input("Volume titrasi 2 (mL)", min_value=0.0)
+
+    volume = (volume1 + volume2) / 2
     valensi = st.number_input("Valensi", min_value=1.0, value=2.0)
 
     be = mr / valensi
@@ -206,8 +230,9 @@ elif menu == "Kompleksometri":
     st.info(f"Indikator = {indikator_data[menu]}")
 
     if st.button("Hitung Kompleksometri"):
+        faktor = 1000
         ekuivalen = massa / be
-        normalitas = ekuivalen / (volume / 1000)
+        normalitas = (ekuivalen * faktor) / volume
         molaritas = normalitas / valensi
 
         st.success(f"Normalitas EDTA = {normalitas:.4f} N")
