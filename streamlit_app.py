@@ -68,9 +68,9 @@ if menu == "Alkalimetri":
     st.info(f"Indikator = {indikator_data[menu]}")
 
     if st.button("Hitung Alkalimetri"):
-        faktor = 1000
+        faktor = 100/25
         ekuivalen = massa / be
-        normalitas = (ekuivalen * faktor) / volume
+        normalitas = (massa) / (faktor * volume)
         molaritas = normalitas / valensi
 
         st.write(f"Rata-rata volume = {volume:.2f} mL")
