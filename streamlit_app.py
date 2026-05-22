@@ -70,11 +70,11 @@ if menu == "Alkalimetri":
     if st.button("Hitung Alkalimetri"):
         faktor = 100/25
         ekuivalen = massa / be
-        normalitas = (massa) / (faktor * volume)
+        normalitas = (massa) / (faktor * volume * be)
         molaritas = normalitas / valensi
 
         st.write(f"Rata-rata volume = {volume:.2f} mL")
-        st.write(f"Rumus normalitas = (BE × faktor) / volume")
+        st.write(f"Rumus normalitas = (massa) / faktor x volume x BE")
         st.success(f"Normalitas NaOH = {normalitas:.4f} N")
         st.success(f"Molaritas NaOH = {molaritas:.4f} M")
 
