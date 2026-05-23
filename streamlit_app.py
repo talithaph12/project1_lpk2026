@@ -1,8 +1,8 @@
 import streamlit as st
 
 st.set_page_config(
-  page_title="Finance Dashboard",
-  layout="wide"
+  page_title="Kuliah Praktisi 23.05",
+  layout="centered"
 )
 
 st.title("📊 Dashboard")
