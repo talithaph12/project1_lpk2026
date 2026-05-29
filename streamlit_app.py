@@ -1,123 +1,265 @@
-# app.py
 import streamlit as st
-import pandas as pd
-import plotly.express as px
-from datetime import datetime
 
-# Dummy user data (untuk simulasi login)
-USERS = {
-    "admin": "admin123",
-    "user1": "password1"
-}
-
-# Konfigurasi halaman
-st.set_page_config(page_title="Personal Finance Dashboard", layout="wide")
-
-# Inisialisasi session_state
-if "authenticated" not in st.session_state:
-    st.session_state.authenticated = False
-if "username" not in st.session_state:
-    st.session_state.username = None
-if "data" not in st.session_state:
-    st.session_state.data = None
-
-# Login Page
-if not st.session_state.authenticated:
-    st.title("🔐 Login Page")
-    username = st.text_input("Username")
-    password = st.text_input("Password", type="password")
-    if st.button("Login"):
-        if USERS.get(username) == password:
-            st.session_state.authenticated = True
-            st.session_state.username = username
-            st.success("Login successful!")
-            st.rerun()
-        else:
-            st.error("Invalid username or password")
-    st.stop()
-
-# Sidebar Navigation
-page = st.sidebar.selectbox(
-    "📄 Go to Page",
-    ("Dashboard", "Upload Data", "Finance Chatbot", "Settings")
+st.set_page_config(
+    page_title="Web Calculator Standardisasi Larutan",
+    layout="wide"
 )
 
-# Sample chatbot reply
-def finance_bot(question, df):
-    if df is None:
-        return "Please upload your data first."
-    if "pengeluaran terbesar" in question.lower():
-        max_row = df.loc[df["Amount"].idxmin()]
-        return f"Pengeluaran terbesar Anda adalah {abs(max_row['Amount']):,.0f} untuk {max_row['Category']} pada {max_row['Date']}."
-    return "Maaf, saya belum memahami pertanyaan Anda sepenuhnya."
+st.title("🧪 Web Calculator Standardisasi Larutan")
 
-# Dashboard Page
-if page == "Dashboard":
-    st.title("📊 Personal Finance Dashboard")
-    if st.session_state.data is None:
-        st.info("Please upload your transaction data first on the 'Upload Data' page.")
+# =========================
+# DATABASE
+# =========================
+database = {
+    "Asam Oksalat": {
+        "BM": 126.07,
+        "valensi": 2
+    },
+    "Boraks": {
+        "BM": 381.37,
+        "valensi": 2
+    },
+    "Kalium Dikromat": {
+        "BM": 294.18,
+        "valensi": 6
+    },
+    "CaCO3": {
+        "BM": 100.09,
+        "valensi": 2
+    }
+}
+
+# =========================
+# PILIH METODE
+# =========================
+metode = st.selectbox(
+    "Pilih Metode Standardisasi",
+    [
+        "Alkalimetri",
+        "Asidimetri",
+        "Permanganometri",
+        "Iodometri",
+        "Kompleksometri"
+    ]
+)
+
+# =========================
+# DATA OTOMATIS
+# =========================
+if metode == "Alkalimetri":
+    baku = "Asam Oksalat"
+    titran = "NaOH"
+    default_massa = 630
+
+elif metode == "Asidimetri":
+    baku = "Boraks"
+    titran = "HCl"
+    default_massa = 500
+
+elif metode == "Permanganometri":
+    baku = "Asam Oksalat"
+    titran = "KMnO4"
+    default_massa = 630
+
+elif metode == "Iodometri":
+    baku = "Kalium Dikromat"
+    titran = "Tiosulfat"
+    default_massa = 500
+
+elif metode == "Kompleksometri":
+    baku = "CaCO3"
+    titran = "EDTA"
+    default_massa = 100
+
+BM = database[baku]["BM"]
+valensi = database[baku]["valensi"]
+
+BE = BM / valensi
+
+# =========================
+# 2 KOLOM
+# =========================
+col1, col2 = st.columns(2)
+
+# =========================
+# INPUT
+# =========================
+with col1:
+
+    st.header("📥 Input Data")
+
+    massa = st.number_input(
+        "Massa standar baku",
+        value=float(default_massa)
+    )
+
+    satuan = st.selectbox(
+        "Satuan massa",
+        ["mg", "g"]
+    )
+
+    if satuan == "g":
+        massa_mg = massa * 1000
     else:
-        df = st.session_state.data
-        total_income = df[df["Amount"] > 0]["Amount"].sum()
-        total_expense = df[df["Amount"] < 0]["Amount"].sum()
-        net_balance = total_income + total_expense
+        massa_mg = massa
 
-        col1, col2, col3 = st.columns(3)
-        col1.metric("Total Income", f"Rp {total_income:,.0f}")
-        col2.metric("Total Expense", f"Rp {abs(total_expense):,.0f}")
-        col3.metric("Net Balance", f"Rp {net_balance:,.0f}")
+    st.write(f"Massa dalam mg = {massa_mg:.2f} mg")
 
-        st.subheader("📈 Monthly Expenses")
-        df["Month"] = pd.to_datetime(df["Date"]).dt.to_period("M").astype(str)
-        monthly = df[df["Amount"] < 0].groupby("Month")["Amount"].sum().reset_index()
-        fig = px.bar(monthly, x="Month", y="Amount", title="Monthly Expenses", labels={'Amount':'Total Expense'})
-        st.plotly_chart(fig, use_container_width=True)
+    vol1 = st.number_input(
+        f"Volume {titran} 1 (mL)",
+        min_value=0.0
+    )
 
-        st.subheader("📊 Expense by Category")
-        category = df[df["Amount"] < 0].groupby("Category")["Amount"].sum().reset_index()
-        fig2 = px.bar(category, x="Category", y="Amount", title="Expenses by Category", labels={'Amount':'Total Expense'})
-        st.plotly_chart(fig2, use_container_width=True)
+    vol2 = st.number_input(
+        f"Volume {titran} 2 (mL)",
+        min_value=0.0
+    )
 
+    pengenceran = st.radio(
+        "Apakah menggunakan pengenceran?",
+        ["Ya", "Tidak"]
+    )
 
-# Upload Page
-elif page == "Upload Data":
-    st.title("📁 Upload Your Financial Transactions")
-    st.markdown("Format file: CSV dengan kolom `Date`, `Amount`, `Category`")
-    uploaded_file = st.file_uploader("Choose a CSV file", type="csv")
-    if uploaded_file:
-        try:
-            df = pd.read_csv(uploaded_file)
-            df["Date"] = pd.to_datetime(df["Date"])
-            st.dataframe(df.head())
-            st.session_state.data = df
-            st.success("Data uploaded successfully!")
-        except Exception as e:
-            st.error(f"Error loading data: {e}")
+    if pengenceran == "Ya":
 
-# Chatbot Page
-elif page == "Finance Chatbot":
-    st.title("💬 Ask Our Finance Bot")
-    st.chat_message("assistant").write("Hi! Saya adalah FinanceBot. Tanyakan apapun seputar keuangan Anda!")
-    if prompt := st.chat_input("Tulis pertanyaan Anda..."):
-        st.chat_message("user").write(prompt)
-        response = finance_bot(prompt, st.session_state.data)
-        st.chat_message("assistant").write(response)
+        volume_total = st.number_input(
+            "Volume total pengenceran (mL)",
+            value=100.0
+        )
 
-# Settings Page
-elif page == "Settings":
-    st.title("⚙️ Settings")
-    st.markdown(f"Welcome, **{st.session_state.username}**!")
-    with st.expander("🔒 Logout"):
-        if st.button("Logout"):
-            st.session_state.authenticated = False
-            st.session_state.username = None
-            st.session_state.data = None
-            st.success("You have been logged out.")
-            st.experimental_rerun()
+        volume_pipet = st.number_input(
+            "Volume yang dipipet (mL)",
+            value=25.0
+        )
 
-    with st.expander("📝 Update Preferences"):
-        theme = st.selectbox("Pilih tema dashboard", ["Default", "Dark", "Colorful"])
-        st.info(f"(Dummy feature) Tema yang dipilih: {theme}")
+        FP = volume_total / volume_pipet
 
-# Footer
-st.sidebar.caption("Made with ❤️ using Streamlit")
+    else:
+        FP = 1
+
+    st.write(f"Faktor Pengali = {FP:.2f}")
+
+    BM_input = st.number_input(
+        "BM",
+        value=float(BM)
+    )
+
+    valensi_input = st.number_input(
+        "Valensi",
+        value=float(valensi)
+    )
+
+    if metode != "Kompleksometri":
+        BE_input = BM_input / valensi_input
+        st.write(f"BE = {BE_input:.4f}")
+
+    hitung = st.button("Hitung")
+
+# =========================
+# OUTPUT
+# =========================
+with col2:
+
+    st.header("📤 Output")
+
+    if hitung:
+
+        if vol1 == 0 or vol2 == 0:
+            st.error("Volume tidak boleh 0")
+
+        else:
+
+            if metode != "Kompleksometri":
+
+                N1 = massa_mg / (FP * vol1 * BE_input)
+                N2 = massa_mg / (FP * vol2 * BE_input)
+
+                N_rata = (N1 + N2) / 2
+
+                RPD = abs((N1 - N2) / N_rata) * 100
+
+                st.subheader("Hasil")
+
+                st.write(f"Normalitas 1 = {N1:.5f} N")
+                st.write(f"Normalitas 2 = {N2:.5f} N")
+                st.write(f"Rerata Normalitas = {N_rata:.5f} N")
+                st.write(f"%RPD = {RPD:.2f}%")
+
+                if RPD < 10:
+                    st.success("Presisi baik (%RPD < 10%)")
+                else:
+                    st.warning("Presisi kurang baik (%RPD > 10%)")
+
+                st.subheader("Transparansi Perhitungan")
+
+                st.latex(r"BE = \frac{BM}{Valensi}")
+
+                st.write(f"BE = {BM_input} / {valensi_input}")
+                st.write(f"BE = {BE_input:.4f}")
+
+                st.latex(r"N = \frac{massa}{FP \times Volume \times BE}")
+
+                st.write(
+                    f"N1 = {massa_mg:.2f} / "
+                    f"({FP:.2f} × {vol1:.2f} × {BE_input:.4f})"
+                )
+
+                st.write(f"N1 = {N1:.5f} N")
+
+                st.write(
+                    f"N2 = {massa_mg:.2f} / "
+                    f"({FP:.2f} × {vol2:.2f} × {BE_input:.4f})"
+                )
+
+                st.write(f"N2 = {N2:.5f} N")
+
+                st.latex(
+                    r"\%RPD = \left| \frac{X_1-X_2}{X_{rerata}} \right| \times 100\%"
+                )
+
+                st.write(f"%RPD = {RPD:.2f}%")
+
+            else:
+
+                M1 = massa_mg / (FP * vol1 * BM_input)
+                M2 = massa_mg / (FP * vol2 * BM_input)
+
+                M_rata = (M1 + M2) / 2
+
+                RPD = abs((M1 - M2) / M_rata) * 100
+
+                st.subheader("Hasil")
+
+                st.write(f"Molaritas 1 = {M1:.5f} M")
+                st.write(f"Molaritas 2 = {M2:.5f} M")
+                st.write(f"Rerata Molaritas = {M_rata:.5f} M")
+                st.write(f"%RPD = {RPD:.2f}%")
+
+                if RPD < 10:
+                    st.success("Presisi baik (%RPD < 10%)")
+                else:
+                    st.warning("Presisi kurang baik (%RPD > 10%)")
+
+                st.subheader("Transparansi Perhitungan")
+
+                st.latex(r"M = \frac{massa}{FP \times Volume \times BM}")
+
+                st.write(
+                    f"M1 = {massa_mg:.2f} / "
+                    f"({FP:.2f} × {vol1:.2f} × {BM_input:.4f})"
+                )
+
+                st.write(f"M1 = {M1:.5f} M")
+
+                st.write(
+                    f"M2 = {massa_mg:.2f} / "
+                    f"({FP:.2f} × {vol2:.2f} × {BM_input:.4f})"
+                )
+
+                st.write(f"M2 = {M2:.5f} M")
+
+                st.latex(
+                    r"\%RPD = \left| \frac{X_1-X_2}{X_{rerata}} \right| \times 100\%"
+                )
+
+                st.write(f"%RPD = {RPD:.2f}%")
