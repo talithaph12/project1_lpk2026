@@ -1,48 +1,135 @@
 import streamlit as st
 
-# =====================================
-# CONFIG
-# =====================================
+# =========================================
+# CONFIG PAGE
+# =========================================
 st.set_page_config(
-    page_title="Web Calculator Standardisasi Larutan",
+    page_title="🧪 Calculator Standardisasi Larutan",
+    page_icon="🧪",
     layout="wide"
 )
 
-st.title("🧪 Web Calculator Standardisasi Larutan")
+# =========================================
+# DARK MODE CUSTOM CSS
+# =========================================
+st.markdown("""
+<style>
 
-st.write(
-    "Web ini digunakan untuk menghitung konsentrasi "
-    "Normalitas/Molaritas hasil standardisasi larutan "
-    "beserta nilai %RPD."
+.stApp {
+    background-color: #0E1117;
+    color: white;
+}
+
+h1, h2, h3, h4 {
+    color: #FFFFFF;
+}
+
+section[data-testid="stSidebar"] {
+    background-color: #161B22;
+}
+
+div[data-testid="stMetric"] {
+    background-color: #161B22;
+    border-radius: 15px;
+    padding: 15px;
+}
+
+.stButton>button {
+    background-color: #00ADB5;
+    color: white;
+    border-radius: 12px;
+    border: none;
+    height: 50px;
+    width: 100%;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.stButton>button:hover {
+    background-color: #03C988;
+    color: white;
+}
+
+div[data-testid="stNumberInput"] {
+    background-color: #161B22;
+    border-radius: 10px;
+    padding: 5px;
+}
+
+div[data-testid="stSelectbox"] {
+    background-color: #161B22;
+    border-radius: 10px;
+    padding: 5px;
+}
+
+div[data-testid="stRadio"] {
+    background-color: #161B22;
+    border-radius: 10px;
+    padding: 10px;
+}
+
+.block-container {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+}
+
+</style>
+""", unsafe_allow_html=True)
+
+# =========================================
+# TITLE
+# =========================================
+st.markdown(
+    """
+    <h1 style='text-align: center;'>
+    🧪 Calculator Standardisasi Larutan
+    </h1>
+    """,
+    unsafe_allow_html=True
 )
 
-# =====================================
-# DATABASE BM DAN VALENSI
-# =====================================
+st.markdown(
+    """
+    <p style='text-align: center; font-size:18px;'>
+    Kalkulator untuk menghitung Normalitas/Molaritas
+    beserta %RPD hasil standardisasi larutan.
+    </p>
+    """,
+    unsafe_allow_html=True
+)
+
+st.divider()
+
+# =========================================
+# DATABASE
+# =========================================
 database = {
     "Asam Oksalat": {
         "BM": 126.07,
         "valensi": 2
     },
+
     "Boraks": {
         "BM": 381.37,
         "valensi": 2
     },
+
     "Kalium Dikromat": {
         "BM": 294.18,
         "valensi": 6
     },
+
     "CaCO3": {
         "BM": 100.09,
         "valensi": 2
     }
 }
 
-# =====================================
+# =========================================
 # PILIH METODE
-# =====================================
+# =========================================
 metode = st.selectbox(
-    "Pilih Metode Standardisasi",
+    "🧪 Pilih Metode Standardisasi",
     [
         "Alkalimetri",
         "Asidimetri",
@@ -52,9 +139,9 @@ metode = st.selectbox(
     ]
 )
 
-# =====================================
-# DATA OTOMATIS
-# =====================================
+# =========================================
+# AUTO DATA
+# =========================================
 if metode == "Alkalimetri":
 
     baku = "Asam Oksalat"
@@ -88,19 +175,17 @@ elif metode == "Kompleksometri":
 BM = database[baku]["BM"]
 valensi = database[baku]["valensi"]
 
-# =====================================
-# 2 KOLOM
-# =====================================
-col1, col2 = st.columns(2)
+# =========================================
+# LAYOUT
+# =========================================
+col1, col2 = st.columns([1,1])
 
-# =====================================
+# =========================================
 # INPUT
-# =====================================
+# =========================================
 with col1:
 
-    st.header("📥 Input Data")
-
-    st.subheader("Standar Baku")
+    st.subheader("📥 Input Data")
 
     massa = st.number_input(
         "Massa standar baku",
@@ -108,7 +193,7 @@ with col1:
     )
 
     satuan = st.selectbox(
-        "Satuan massa",
+        "Satuan Massa",
         ["mg", "g"]
     )
 
@@ -117,9 +202,9 @@ with col1:
     else:
         massa_mg = massa
 
-    st.write(f"Hasil konversi massa = {massa_mg:.2f} mg")
+    st.info(f"Hasil konversi massa = {massa_mg:.2f} mg")
 
-    st.subheader("Volume Titran")
+    st.markdown("### ⚗️ Volume Titran")
 
     vol1 = st.number_input(
         f"Volume {titran} pertama (mL)",
@@ -131,7 +216,7 @@ with col1:
         min_value=0.0
     )
 
-    st.subheader("Pengenceran")
+    st.markdown("### 🧪 Pengenceran")
 
     pengenceran = st.radio(
         "Apakah menggunakan pengenceran?",
@@ -155,9 +240,9 @@ with col1:
     else:
         FP = 1
 
-    st.write(f"Faktor Pengali (FP) = {FP:.2f}")
+    st.success(f"Faktor Pengali (FP) = {FP:.2f}")
 
-    st.subheader("Database Otomatis")
+    st.markdown("### 🧬 Database Otomatis")
 
     BM_input = st.number_input(
         "BM",
@@ -173,16 +258,16 @@ with col1:
 
         BE_input = BM_input / valensi_input
 
-        st.write(f"BE = {BE_input:.4f} mg/mgrek")
+        st.info(f"BE = {BE_input:.4f} mg/mgrek")
 
-    hitung = st.button("Hitung")
+    hitung = st.button("🔍 Hitung Sekarang")
 
-# =====================================
+# =========================================
 # OUTPUT
-# =====================================
+# =========================================
 with col2:
 
-    st.header("📤 Output Perhitungan")
+    st.subheader("📤 Output Perhitungan")
 
     if hitung:
 
@@ -211,136 +296,55 @@ with col2:
                     (N1 - N2) / N_rata
                 ) * 100
 
-                st.subheader("Hasil Konsentrasi")
+                st.metric(
+                    "Normalitas 1",
+                    f"{N1:.4f} N"
+                )
 
-                st.write(f"Normalitas 1 = {N1:.4f} N")
+                st.metric(
+                    "Normalitas 2",
+                    f"{N2:.4f} N"
+                )
 
-                st.write(f"Normalitas 2 = {N2:.4f} N")
-
-                st.write(
-                    f"Rerata Normalitas = "
+                st.metric(
+                    "Rerata Normalitas",
                     f"{N_rata:.4f} N"
                 )
 
-                st.subheader("Hasil %RPD")
+                st.metric(
+                    "%RPD",
+                    f"{RPD:.2f}%"
+                )
 
-                st.write(f"%RPD = {RPD:.2f}%")
-
-                st.subheader("Kesimpulan")
+                st.markdown("## 📋 Kesimpulan")
 
                 if RPD < 10:
 
                     st.success(
-                        f"Hasil standardisasi "
-                        f"menunjukkan rerata "
-                        f"konsentrasi sebesar "
-                        f"{N_rata:.4f} N dengan "
-                        f"nilai %RPD sebesar "
-                        f"{RPD:.2f}%. "
-                        f"Nilai %RPD < 10%, "
-                        f"sehingga presisi "
-                        f"pengujian dinyatakan baik."
+                        f"""
+                        Hasil standardisasi menunjukkan
+                        rerata konsentrasi sebesar
+                        {N_rata:.4f} N dengan nilai
+                        %RPD sebesar {RPD:.2f}%.
+                        
+                        Presisi pengujian dinyatakan baik
+                        karena %RPD < 10%.
+                        """
                     )
 
                 else:
 
                     st.warning(
-                        f"Hasil standardisasi "
-                        f"menunjukkan rerata "
-                        f"konsentrasi sebesar "
-                        f"{N_rata:.4f} N dengan "
-                        f"nilai %RPD sebesar "
-                        f"{RPD:.2f}%. "
-                        f"Nilai %RPD > 10%, "
-                        f"sehingga presisi "
-                        f"pengujian dinyatakan "
-                        f"kurang baik."
+                        f"""
+                        Hasil standardisasi menunjukkan
+                        rerata konsentrasi sebesar
+                        {N_rata:.4f} N dengan nilai
+                        %RPD sebesar {RPD:.2f}%.
+                        
+                        Presisi pengujian dinyatakan
+                        kurang baik karena %RPD > 10%.
+                        """
                     )
-
-                # =====================================
-                # TRANSPARANSI RUMUS
-                # =====================================
-                st.subheader("Transparansi Perhitungan")
-
-                st.write("### Rumus Berat Ekuivalen")
-
-                st.latex(
-                    r'''
-                    BE = \frac{BM}{Valensi}
-                    '''
-                )
-
-                st.write(
-                    f"BE = {BM_input} / "
-                    f"{valensi_input}"
-                )
-
-                st.write(
-                    f"BE = {BE_input:.4f} mg/mgrek"
-                )
-
-                st.write("### Rumus Normalitas")
-
-                st.latex(
-                    r'''
-                    N =
-                    \frac{
-                    massa\ standar\ baku
-                    }{
-                    FP \times Volume \times BE
-                    }
-                    '''
-                )
-
-                st.write("### Perhitungan N1")
-
-                st.write(
-                    f"N1 = {massa_mg:.2f} / "
-                    f"({FP:.2f} × "
-                    f"{vol1:.2f} × "
-                    f"{BE_input:.4f})"
-                )
-
-                st.write(f"N1 = {N1:.4f} N")
-
-                st.write("### Perhitungan N2")
-
-                st.write(
-                    f"N2 = {massa_mg:.2f} / "
-                    f"({FP:.2f} × "
-                    f"{vol2:.2f} × "
-                    f"{BE_input:.4f})"
-                )
-
-                st.write(f"N2 = {N2:.4f} N")
-
-                st.write("### Rumus %RPD")
-
-                st.latex(
-                    r'''
-                    \%RPD =
-                    \left|
-                    \frac{
-                    X_1 - X_2
-                    }{
-                    X_{rerata}
-                    }
-                    \right|
-                    \times 100\%
-                    '''
-                )
-
-                st.write(
-                    f"%RPD = |"
-                    f"({N1:.4f} - "
-                    f"{N2:.4f}) / "
-                    f"{N_rata:.4f}"
-                    f"| × 100%"
-                )
-
-                st.write(
-                    f"%RPD = {RPD:.2f}%"
-                )
 
             # =====================================
             # KOMPLEKSOMETRI
@@ -361,116 +365,113 @@ with col2:
                     (M1 - M2) / M_rata
                 ) * 100
 
-                st.subheader("Hasil Konsentrasi")
+                st.metric(
+                    "Molaritas 1",
+                    f"{M1:.4f} M"
+                )
 
-                st.write(f"Molaritas 1 = {M1:.4f} M")
+                st.metric(
+                    "Molaritas 2",
+                    f"{M2:.4f} M"
+                )
 
-                st.write(f"Molaritas 2 = {M2:.4f} M")
-
-                st.write(
-                    f"Rerata Molaritas = "
+                st.metric(
+                    "Rerata Molaritas",
                     f"{M_rata:.4f} M"
                 )
 
-                st.subheader("Hasil %RPD")
+                st.metric(
+                    "%RPD",
+                    f"{RPD:.2f}%"
+                )
 
-                st.write(f"%RPD = {RPD:.2f}%")
-
-                st.subheader("Kesimpulan")
+                st.markdown("## 📋 Kesimpulan")
 
                 if RPD < 10:
 
                     st.success(
-                        f"Hasil standardisasi "
-                        f"menunjukkan rerata "
-                        f"konsentrasi sebesar "
-                        f"{M_rata:.4f} M dengan "
-                        f"nilai %RPD sebesar "
-                        f"{RPD:.2f}%. "
-                        f"Nilai %RPD < 10%, "
-                        f"sehingga presisi "
-                        f"pengujian dinyatakan baik."
+                        f"""
+                        Hasil standardisasi menunjukkan
+                        rerata konsentrasi sebesar
+                        {M_rata:.4f} M dengan nilai
+                        %RPD sebesar {RPD:.2f}%.
+                        
+                        Presisi pengujian dinyatakan baik
+                        karena %RPD < 10%.
+                        """
                     )
 
                 else:
 
                     st.warning(
-                        f"Hasil standardisasi "
-                        f"menunjukkan rerata "
-                        f"konsentrasi sebesar "
-                        f"{M_rata:.4f} M dengan "
-                        f"nilai %RPD sebesar "
-                        f"{RPD:.2f}%. "
-                        f"Nilai %RPD > 10%, "
-                        f"sehingga presisi "
-                        f"pengujian dinyatakan "
-                        f"kurang baik."
+                        f"""
+                        Hasil standardisasi menunjukkan
+                        rerata konsentrasi sebesar
+                        {M_rata:.4f} M dengan nilai
+                        %RPD sebesar {RPD:.2f}%.
+                        
+                        Presisi pengujian dinyatakan
+                        kurang baik karena %RPD > 10%.
+                        """
                     )
 
-                # =====================================
-                # TRANSPARANSI
-                # =====================================
-                st.subheader("Transparansi Perhitungan")
+            # =====================================
+            # TRANSPARANSI
+            # =====================================
+            st.divider()
 
-                st.write("### Rumus Molaritas")
+            st.markdown("## 🧮 Transparansi Perhitungan")
+
+            if metode != "Kompleksometri":
+
+                st.latex(
+                    r'''
+                    BE = \frac{BM}{Valensi}
+                    '''
+                )
+
+                st.write(
+                    f"BE = {BM_input} / {valensi_input}"
+                )
+
+                st.write(
+                    f"BE = {BE_input:.4f} mg/mgrek"
+                )
+
+                st.latex(
+                    r'''
+                    N =
+                    \frac{
+                    massa\ standar\ baku
+                    }{
+                    FP \times Volume \times BE
+                    }
+                    '''
+                )
+
+            else:
 
                 st.latex(
                     r'''
                     M =
                     \frac{
-                    massa\ CaCO_3
+                    massa\ standar\ baku
                     }{
                     FP \times Volume \times BM
                     }
                     '''
                 )
 
-                st.write("### Perhitungan M1")
-
-                st.write(
-                    f"M1 = {massa_mg:.2f} / "
-                    f"({FP:.2f} × "
-                    f"{vol1:.2f} × "
-                    f"{BM_input:.4f})"
-                )
-
-                st.write(f"M1 = {M1:.4f} M")
-
-                st.write("### Perhitungan M2")
-
-                st.write(
-                    f"M2 = {massa_mg:.2f} / "
-                    f"({FP:.2f} × "
-                    f"{vol2:.2f} × "
-                    f"{BM_input:.4f})"
-                )
-
-                st.write(f"M2 = {M2:.4f} M")
-
-                st.write("### Rumus %RPD")
-
-                st.latex(
-                    r'''
-                    \%RPD =
-                    \left|
-                    \frac{
-                    X_1 - X_2
-                    }{
-                    X_{rerata}
-                    }
-                    \right|
-                    \times 100\%
-                    '''
-                )
-
-                st.write(
-                    f"%RPD = |"
-                    f"({M1:.4f} - "
-                    f"{M2:.4f}) / "
-                    f"{M_rata:.4f}"
-                    f"| × 100%"
-                )
-
-                st.write(
-                    f"%RPD = {RPD:.2f}%"
-                )
+            st.latex(
+                r'''
+                \%RPD =
+                \left|
+                \frac{
+                X_1 - X_2
+                }{
+                X_{rerata}
+                }
+                \right|
+                \times 100\%
+                '''
+            )
